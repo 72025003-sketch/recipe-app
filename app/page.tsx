@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { callMyApi } from './actions';
+import ReactMarkdown from 'react-markdown';
 
 export default function Page() {
   const [input, setInput] = useState('');
@@ -20,24 +21,14 @@ export default function Page() {
       // ここでサーバーアクション（裏方の関数）を呼び出します
       const data = await callMyApi(input);
 
-      if (data.success && data.message) {
-        // Gemini APIのレスポンスからテキストを抽出
-        const text = data.message.response?.candidates?.[0]?.content?.parts?.[0]?.text || 'レシピを生成できませんでした';
-        setResult(text);
+      if (data.success) {
+        setResult(data.message);
         setTimestamp(data.timestamp);
       } else {
-        setResult(data.message as string || '予期せぬエラーが発生しました');
+        setResult(data.message || '予期せぬエラーが発生しました');
       }
     } catch (e) {
-      console.error(e);
-      // TypeScriptの流儀：まず型をチェックする
-      if (e instanceof Error) {
-        // Error型だと確定したので .message が使える
-        setResult(`エラーが発生しました: ${e.message}`);
-      } else {
-        // Error型じゃない謎のエラーの場合
-        setResult("予期せぬエラーが発生しました");
-      }
+      setResult("エラーが発生しました");
     } finally {
       setLoading(false);
     }
@@ -142,17 +133,22 @@ export default function Page() {
           }}>
             📋 生成されたレシピ
           </h2>
-          <pre style={{
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            fontFamily: 'ui-monospace, monospace',
-            fontSize: '0.95rem',
-            lineHeight: '1.6',
-            color: '#333',
-            margin: '0'
-          }}>
+          <ReactMarkdown
+            components={{
+              h1: ({ node, ...props }) => <h1 style={{ fontSize: '1.8rem', marginTop: '1rem', marginBottom: '0.5rem', color: '#333' }} {...props} />,
+              h2: ({ node, ...props }) => <h2 style={{ fontSize: '1.5rem', marginTop: '1rem', marginBottom: '0.5rem', color: '#444' }} {...props} />,
+              h3: ({ node, ...props }) => <h3 style={{ fontSize: '1.2rem', marginTop: '0.8rem', marginBottom: '0.4rem', color: '#555' }} {...props} />,
+              p: ({ node, ...props }) => <p style={{ marginBottom: '0.8rem', lineHeight: '1.6' }} {...props} />,
+              ul: ({ node, ...props }) => <ul style={{ marginLeft: '1.5rem', marginBottom: '0.8rem' }} {...props} />,
+              ol: ({ node, ...props }) => <ol style={{ marginLeft: '1.5rem', marginBottom: '0.8rem' }} {...props} />,
+              li: ({ node, ...props }) => <li style={{ marginBottom: '0.3rem' }} {...props} />,
+              strong: ({ node, ...props }) => <strong style={{ color: '#4CAF50', fontWeight: '700' }} {...props} />,
+              em: ({ node, ...props }) => <em style={{ fontStyle: 'italic', color: '#666' }} {...props} />,
+              code: ({ node, ...props }) => <code style={{ backgroundColor: '#f5f5f5', padding: '2px 6px', borderRadius: '3px', fontFamily: 'monospace' }} {...props} />,
+            }}
+          >
             {result}
-          </pre>
+          </ReactMarkdown>
           {timestamp && (
             <p style={{
               marginTop: '16px',
