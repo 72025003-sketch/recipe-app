@@ -18,6 +18,15 @@ export default async function callMyApi(userInput: string) {
           ### 調理時間
           ### 調理手順
           ### 一言コメント
+
+          ** 【最重要ルール】 **
+          食材として判断できない単語や、料理に無関係な単語は無視し、使用可能な食材のみでレシピを構成してください。
+
+          ** 使用可能な食材が極端に少ない場合（例：塩、米のみの入力）や、調理が不可能な食材のみである場合は、レシピを生成せず、以下のメッセージのみ出力してください: **
+          大変申し訳ありません。ご提示の食材だけではレシピの作成が困難です。もう少し食材を追加していただけませんか？
+
+          ** 食材として判断できない単語や料理に無関係な単語のみが入力された場合は、レシピを生成せず、以下のメッセージのみ出力してください: **
+          大変申し訳ありません。ご提示の食材でレシピを作成することはできません。
         `;
 
         const result = await model.generateContent(prompt);
@@ -38,7 +47,7 @@ export default async function callMyApi(userInput: string) {
         return {
             success: true,
             message: recipe,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toLocaleString('ja-jp')
         };
 
     } catch (e: any) {
@@ -47,7 +56,7 @@ export default async function callMyApi(userInput: string) {
         return {
             success: false,
             message: errorMessage,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toLocaleString('ja-jp')
         };
     }
 }
