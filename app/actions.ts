@@ -1,6 +1,6 @@
 'use server';
 
-export async function callMyApi(userInput: string) {
+export default async function callMyApi(userInput: string) {
     const { GoogleGenerativeAI } = require("@google/generative-ai");
     require('dotenv').config();
     const API_KEY = process.env.GEMINI_API_KEY;
@@ -31,7 +31,7 @@ export async function callMyApi(userInput: string) {
                 message: "APIからレスポンスが返されませんでした",
                 timestamp: new Date().toISOString()
             };
-        };
+        }
 
         const recipe = response.text();
 
