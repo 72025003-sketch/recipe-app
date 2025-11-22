@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { callMyApi } from './actions';
+import callMyApi from './actions';
 import ReactMarkdown from 'react-markdown';
 
 export default function Page() {
